@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Jonard · Portfolio</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 70px; }
+    :root {
+      --bg-primary: #000;
+      --bg-secondary: #0a0e1a;
+      --bg-card: #0a0e1a;
+      --bg-elevated: #111;
+      --text-primary: #e0e0e0;
+      --text-secondary: #9ca3af;
+      --border-color: #1a1a2e;
+      --nav-bg: rgba(0,0,0,0.9);
+      --primary: #7c3aed;
+      --accent: #a78bfa;
+      --gold: #f59e0b;
+      --neon-purple: #a78bfa;
+      --neon-amber: #f59e0b;
+      --neon-glow: rgba(167,139,250,0.15);
+    }
+    body.light-mode {
+      --bg-primary: #f8fafc;
+      --bg-secondary: #ffffff;
+      --bg-card: #ffffff;
+      --bg-elevated: #f1f5f9;
+      --text-primary: #1e293b;
+      --text-secondary: #64748b;
+      --border-color: #e2e8f0;
+      --nav-bg: rgba(255,255,255,0.9);
+    }
+    body {
+      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.7;
+      transition: background 0.3s, color 0.3s;
+    }
+    nav {
+      position: fixed; top: 0; width: 100%; z-index: 100;
+      background: var(--nav-bg); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      padding: 8px 15px;
+      display: flex; justify-content: space-between; align-items: center;
+      transition: background 0.3s, border-color 0.3s;
+    }
+    nav .logo { font-weight: 900; color: var(--accent); font-size: 1.25rem; letter-spacing: -0.5px; text-shadow: 0 0 15px rgba(167,139,250,0.2); }
+    .nav-links a {
+      color: var(--text-secondary); text-decoration: none; margin-left: 8px; font-size: 0.85rem; font-weight: 500;
+      padding: 6px 14px; border-radius: 50px; transition: color 0.2s, background 0.2s;
+    }
+    .nav-links a:hover { color: #fff; background: rgba(167,139,250,0.1); }
+    .theme-toggle {
+      background: none; border: 1px solid var(--border-color); color: var(--text-secondary);
+      border-radius: 8px; width: 38px; height: 38px; cursor: pointer; font-size: 1rem;
+      margin-left: 10px; vertical-align: middle; transition: border-color 0.3s, color 0.3s;
+    }
+    .theme-toggle:hover { border-color: var(--accent); color: var(--accent); }
+    .lang-toggle {
+      background: none; border: 1px solid var(--border-color); color: var(--text-secondary);
+      border-radius: 8px; width: 42px; height: 38px; cursor: pointer; font-size: 0.75rem;
+      margin-left: 10px; vertical-align: middle; transition: border-color 0.3s, color 0.3s;
+      font-weight: 800; letter-spacing: 0.5px;
+    }
+    .lang-toggle:hover { border-color: var(--gold); color: var(--gold); }
+    .hero-swatch.active { border-color: var(--accent); transform: scale(1.15); box-shadow: 0 0 12px rgba(167,139,250,0.3); }
+    .color-swatch {
+      width: 36px; height: 36px; border-radius: 50%; border: 3px solid var(--border-color);
+      cursor: pointer; transition: transform 0.2s, border-color 0.2s; outline: none;
+    }
+    .color-swatch:hover { transform: scale(1.15); }
+    .color-swatch.active { border-color: var(--accent); transform: scale(1.15); box-shadow: 0 0 12px rgba(167,139,250,0.3); }
+    .hamburger { display: none; background: none; border: 1px solid var(--border-color); color: var(--text-secondary); border-radius: 8px; width: 38px; height: 38px; cursor: pointer; font-size: 1.1rem; margin-left: 10px; vertical-align: middle; }
+    @media (max-width: 650px) {
+      .hamburger { display: inline-flex; align-items: center; justify-content: center; }
+      .nav-links { display: none; position: absolute; top: 100%; left: 0; right: 0; background: var(--nav-bg); flex-direction: column; padding: 20px; border-bottom: 1px solid var(--border-color); }
+      .nav-links.open { display: flex; }
+      .nav-links a { margin: 10px 0; }
+    }
+
+    /* ── Twinkling Stars Background ── */
+    #starsCanvas {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 0; pointer-events: none;
+    }
+    #scrollProgress {
+      position: fixed; top: 0; left: 0; height: 3px;
+      background: linear-gradient(90deg, var(--primary), var(--accent), var(--gold));
+      z-index: 1001; width: 0%; transition: width 0.1s;
+    }
+
+    .hero {
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      text-align: center; padding: 80px 20px;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(167,139,250,0.08) 0%, transparent 70%),
+        radial-gradient(ellipse 80% 50% at 50% 120%, rgba(245,158,11,0.05) 0%, transparent 70%);
+      position: relative; z-index: 2;
+    }
+    .hero::after {
+      content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: radial-gradient(2px 2px at 20% 30%, rgba(167,139,250,0.15) 0%, transparent 100%),
+                  radial-gradient(2px 2px at 80% 70%, rgba(245,158,11,0.1) 0%, transparent 100%);
+      background-size: 200px 200px; pointer-events: none; z-index: -1;
+    }
+    .hero-content { max-width: 600px; }
+    .avatar-wrap {
+      position: relative; width: 150px; height: 150px; margin: 0 auto 30px;
+    }
+    .avatar-ring {
+      position: absolute; inset: -4px; border-radius: 50%;
+      background: conic-gradient(from 0deg, var(--accent), var(--primary), var(--gold), var(--accent), var(--primary), var(--accent));
+      animation: spinRing 3s linear infinite;
+      mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #fff calc(100% - 3px));
+      -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #fff calc(100% - 3px));
+    }
+    @keyframes spinRing { to { transform: rotate(360deg); } }
+    .avatar {
+      width: 100%; height: 100%; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--primary), var(--gold));
+      padding: 4px;
+      animation: float 3s ease-in-out infinite;
+      box-shadow: 0 0 30px rgba(167,139,250,0.2), 0 0 60px rgba(167,139,250,0.08);
+      position: relative; z-index: 1;
+    }
+    .avatar-inner {
+      width: 100%; height: 100%; border-radius: 50%;
+      background: var(--bg-primary); display: flex; align-items: center; justify-content: center;
+      font-size: 3.5rem; font-weight: 900; color: var(--accent);
+      border: 3px solid var(--bg-primary); overflow: hidden;
+      transition: background 0.3s, border-color 0.3s;
+    }
+    .avatar-inner img { width: 100%; height: 100%; object-fit: cover; }
+    .avatar-status {
+      position: absolute; bottom: 6px; right: 6px; z-index: 2;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #22c55e; border: 3px solid var(--bg-primary);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,0.4)} 50%{box-shadow:0 0 0 8px rgba(34,197,94,0)} }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+    @keyframes blink { 50%{opacity:0} }
+    @keyframes neonPulse { 0%,100%{box-shadow:0 0 20px rgba(167,139,250,0.15),0 0 60px rgba(167,139,250,0.05)} 50%{box-shadow:0 0 30px rgba(167,139,250,0.3),0 0 80px rgba(167,139,250,0.1)} }
+    .hero h1 {
+      font-size: 2.2rem; font-weight: 900; letter-spacing: -0.5px;
+      background: linear-gradient(135deg, var(--accent), var(--gold));
+      background-clip: text; -webkit-background-clip: text; color: transparent;
+      text-shadow: 0 0 30px rgba(167,139,250,0.15);
+    }
+    .hero .tagline { color: var(--accent); font-size: 1.15rem; margin: 12px 0 20px; font-weight: 600; letter-spacing: 0.3px; text-shadow: 0 0 20px rgba(167,139,250,0.15); }
+    .hero p { color: var(--text-secondary); max-width: 480px; margin: 0 auto; font-size: 0.95rem; }
+    .hero-btns { margin-top: 30px; display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
+    .hero-themes { margin-top: 20px; display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; }
+    .hero-swatch {
+      width: 30px; height: 30px; border-radius: 50%; border: 3px solid var(--border-color);
+      cursor: pointer; transition: transform 0.2s, border-color 0.2s; outline: none; padding: 0;
+    }
+    .hero-swatch:hover { transform: scale(1.2); border-color: var(--accent); }
+    .hero-swatch.active { border-color: var(--accent); transform: scale(1.15); box-shadow: 0 0 12px rgba(167,139,250,0.3); }
+    .btn {
+      padding: 14px 32px; border-radius: 50px; font-weight: 700; font-size: 0.85rem; letter-spacing: 0.3px;
+      text-decoration: none; display: inline-flex; align-items: center; gap: 10px;
+      transition: transform 0.25s, box-shadow 0.25s;
+    }
+    .btn:hover { transform: translateY(-4px); }
+    .btn-primary { background: linear-gradient(135deg, var(--primary), var(--accent)); color: #fff; box-shadow: 0 4px 20px rgba(124,58,237,0.3); }
+    .btn-primary:hover { box-shadow: 0 8px 30px rgba(167,139,250,0.4), 0 0 60px rgba(167,139,250,0.15); }
+    .btn-secondary { background: var(--bg-elevated); color: var(--text-primary); border: 1px solid var(--border-color); }
+    .btn-secondary:hover { border-color: rgba(167,139,250,0.3); background: rgba(167,139,250,0.05); }
+    .container { max-width: 860px; margin: 0 auto; padding: 100px 20px; position: relative; z-index: 2; }
+    .section-title {
+      font-size: 1.8rem; font-weight: 800; margin-bottom: 45px; letter-spacing: -0.5px;
+      display: flex; align-items: center; gap: 14px;
+    }
+    .section-title i { color: var(--accent); font-size: 1.3rem; filter: drop-shadow(0 0 6px rgba(167,139,250,0.3)); }
+    .card {
+      background: var(--bg-card); border-radius: 20px; padding: 30px; margin-top: 20px;
+      border: 1px solid var(--border-color); transition: border-color 0.3s, transform 0.3s, background 0.3s, box-shadow 0.3s;
+      position: relative; overflow: hidden;
+    }
+    .card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 1px; background: linear-gradient(90deg, transparent, rgba(167,139,250,0.2), transparent); }
+    .card:hover { border-color: rgba(167,139,250,0.3); transform: translateY(-6px); box-shadow: 0 12px 40px rgba(0,0,0,0.3), 0 0 20px rgba(167,139,250,0.08); }
+    .card i { font-size: 1.8rem; color: var(--accent); margin-bottom: 12px; }
+    .card h3 { color: var(--gold); margin-bottom: 8px; }
+    .card p { color: var(--text-secondary); font-size: 0.9rem; }
+    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 650px) { .about-grid { grid-template-columns: 1fr; } }
+    .project-grid { display: grid; gap: 20px; }
+    .project-card {
+      display: block; text-decoration: none; color: inherit;
+      background: var(--bg-card); border-radius: 20px; padding: 28px; margin-top: 18px;
+      border: 1px solid var(--border-color); border-left: 4px solid var(--primary);
+      transition: border-color 0.3s, transform 0.3s, background 0.3s, box-shadow 0.3s;
+      position: relative; overflow: hidden;
+    }
+    .project-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 1px; background: linear-gradient(90deg, transparent, rgba(167,139,250,0.15), transparent); }
+    .project-card:hover { border-color: rgba(167,139,250,0.3); border-left-color: var(--accent); transform: translateX(6px); box-shadow: 0 8px 30px rgba(0,0,0,0.3), 0 0 0 1px rgba(167,139,250,0.05); }
+    .project-card h3 { color: var(--accent); margin-bottom: 6px; }
+    .project-card .tech { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; }
+    .project-card .tech span { background: var(--bg-elevated); color: var(--gold); padding: 3px 10px; border-radius: 12px; font-size: 0.7rem; border: 1px solid var(--border-color); }
+    .project-card p { color: var(--text-secondary); font-size: 0.85rem; }
+    .skills-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+    .skill-badge {
+      background: var(--bg-elevated); border: 1px solid var(--border-color);
+      padding: 10px 18px; border-radius: 12px; font-size: 0.85rem;
+      color: var(--text-primary); display: flex; align-items: center; gap: 8px;
+      transition: border-color 0.3s, transform 0.2s, background 0.3s, color 0.3s;
+    }
+    .skill-badge:hover { border-color: var(--accent); transform: scale(1.05); box-shadow: 0 0 15px rgba(167,139,250,0.15), 0 0 40px rgba(167,139,250,0.05); }
+    .skill-badge i { color: var(--accent); }
+    .skill-bar-group { margin-top: 30px; }
+    .skill-bar-item { margin-bottom: 15px; }
+    .skill-bar-item .info { display: flex; justify-content: space-between; font-size: 0.85rem; margin-bottom: 5px; }
+    .skill-bar-item .info span { color: var(--text-secondary); }
+    .skill-bar-item .bar { height: 8px; background: var(--bg-elevated); border-radius: 10px; overflow: hidden; }
+    .skill-bar-item .fill { height: 100%; border-radius: 10px; background: linear-gradient(90deg, var(--accent), var(--primary)); width: 0; transition: width 1s ease; box-shadow: 0 0 8px rgba(167,139,250,0.3); }
+    .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 45px; }
+    .stat-card {
+      background: var(--bg-card); border-radius: 18px; padding: 24px 20px; text-align: center;
+      border: 1px solid var(--border-color); transition: background 0.3s, border-color 0.3s, transform 0.3s;
+      position: relative; overflow: hidden;
+    }
+    .stat-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 1px; background: linear-gradient(90deg, transparent, rgba(167,139,250,0.2), transparent); }
+    .stat-card:hover { border-color: rgba(167,139,250,0.3); transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0,0,0,0.3), 0 0 15px rgba(167,139,250,0.08); }
+    .stat-card .num { font-size: 1.8rem; font-weight: 900; background: linear-gradient(135deg, var(--accent), var(--gold)); background-clip: text; -webkit-background-clip: text; color: transparent; }
+    .stat-card .label { color: var(--text-secondary); font-size: 0.75rem; margin-top: 4px; }
+    @media (max-width: 500px) { .stats { grid-template-columns: 1fr; } }
+    .contact-section {
+      background: var(--bg-card); border-radius: 24px; padding: 50px 40px; text-align: center;
+      border: 1px solid var(--border-color); transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+      position: relative; overflow: hidden;
+    }
+    .contact-section::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 1px; background: linear-gradient(90deg, transparent, rgba(167,139,250,0.2), transparent); }
+    .contact-section h2 { font-size: 1.6rem; margin-bottom: 10px; letter-spacing: -0.5px; }
+    .contact-section p { color: var(--text-secondary); margin-bottom: 25px; }
+    .contact-links { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
+    .contact-link {
+      background: var(--bg-elevated); border: 1px solid var(--border-color); border-radius: 16px;
+      padding: 14px 28px; color: var(--text-primary); text-decoration: none;
+      display: flex; align-items: center; gap: 10px;
+      transition: border-color 0.3s, transform 0.25s, background 0.3s, color 0.3s, box-shadow 0.3s;
+      font-weight: 500;
+    }
+    .contact-link:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.2), 0 0 15px rgba(167,139,250,0.12); background: rgba(167,139,250,0.05); }
+    .contact-link i { font-size: 1.2rem; color: var(--accent); }
+    .fade-in { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
+    .fade-in.visible { opacity: 1; transform: translateY(0); }
+    #backToTop {
+      position: fixed; bottom: 25px; right: 25px; z-index: 999;
+      width: 45px; height: 45px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff; border: none; font-size: 1.1rem; cursor: pointer;
+      opacity: 0; visibility: hidden;
+      transition: opacity 0.3s, transform 0.3s;
+      box-shadow: 0 4px 15px rgba(124,58,237,0.3);
+    }
+    #backToTop.show { opacity: 1; visibility: visible; }
+    #backToTop:hover { transform: translateY(-4px); box-shadow: 0 0 25px rgba(167,139,250,0.4), 0 4px 15px rgba(124,58,237,0.3); }
+    .settings-btn {
+      position: fixed; top: 60px; right: 20px; z-index: 999;
+      width: 40px; height: 40px; border-radius: 50%;
+      background: rgba(255,255,255,0.04); border: 1px solid var(--border-color);
+      color: var(--text-secondary); font-size: 1rem; cursor: pointer;
+      transition: border-color 0.3s, color 0.3s;
+    }
+    .settings-btn:hover { border-color: var(--accent); color: var(--accent); box-shadow: 0 0 15px rgba(167,139,250,0.15); }
+    .settings-panel {
+      position: fixed; top: 0; right: -100%; width: 320px; height: 100%; z-index: 1000;
+      background: var(--bg-card); border-left: 1px solid var(--border-color);
+      padding: 85px 28px 28px; overflow-y: auto;
+      transition: right 0.35s ease, background 0.3s, border-color 0.3s; box-shadow: -8px 0 30px rgba(0,0,0,0.3);
+    }
+    .settings-panel.open { right: 0; }
+    .settings-panel h3 { color: var(--accent); margin-bottom: 20px; font-size: 1.1rem; }
+    .settings-panel label { color: var(--text-secondary); font-size: 0.8rem; display: block; margin: 12px 0 4px; }
+    .settings-panel input { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); font-size: 0.85rem; transition: background 0.3s, color 0.3s, border-color 0.3s; }
+    .settings-panel input[type="file"] { padding: 6px; }
+    .settings-panel .save-btn {
+      width: 100%; margin-top: 20px; padding: 12px; border-radius: 10px;
+      background: linear-gradient(135deg, var(--primary), var(--accent)); color: #fff;
+      border: none; font-weight: 700; cursor: pointer;
+    }
+    .settings-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; display: none; }
+    .settings-overlay.show { display: block; }
+
+    /* ── Password Modal ── */
+    .pwd-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7); z-index: 2000;
+      display: none; align-items: center; justify-content: center;
+      backdrop-filter: blur(8px);
+    }
+    .pwd-overlay.show { display: flex; }
+    .pwd-box {
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: 24px; padding: 35px; width: 340px; max-width: 90vw;
+      text-align: center;
+    }
+    .pwd-box h3 { color: var(--accent); margin-bottom: 6px; }
+    .pwd-box p { color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 20px; }
+    .pwd-box input {
+      width: 100%; padding: 14px; border-radius: 12px;
+      border: 1px solid var(--border-color); background: var(--bg-elevated);
+      color: var(--text-primary); font-size: 1rem; text-align: center;
+      outline: none; transition: border-color 0.3s;
+    }
+    .pwd-box input:focus { border-color: var(--accent); }
+    .pwd-box .pwd-actions { display: flex; gap: 10px; margin-top: 15px; }
+    .pwd-box .pwd-actions button {
+      flex: 1; padding: 12px; border-radius: 12px; border: none;
+      font-weight: 700; cursor: pointer; font-size: 0.85rem; transition: all 0.2s;
+    }
+    .pwd-box .pwd-actions .pwd-submit { background: linear-gradient(135deg, var(--primary), var(--accent)); color: #fff; }
+    .pwd-box .pwd-actions .pwd-cancel { background: var(--bg-elevated); color: var(--text-primary); border: 1px solid var(--border-color); }
+    footer { text-align: center; padding: 40px 30px; color: var(--text-secondary); font-size: 0.85rem; border-top: 1px solid var(--border-color); transition: color 0.3s, border-color 0.3s; }
+
+    /* ── Floating Social Bar ── */
+    .social-float {
+      position: fixed; left: 20px; top: 50%; transform: translateY(-50%);
+      display: flex; flex-direction: column; gap: 10px; z-index: 50;
+    }
+    .social-float a {
+      width: 40px; height: 40px; border-radius: 12px;
+      background: var(--bg-card); border: 1px solid var(--border-color);
+      color: var(--text-secondary); display: flex; align-items: center; justify-content: center;
+      text-decoration: none; font-size: 1rem;
+      transition: all 0.25s;
+    }
+    .social-float a:hover { color: #fff; background: var(--primary); border-color: var(--primary); transform: scale(1.1); }
+    @media (max-width: 768px) { .social-float { display: none; } }
+
+    /* ── Services Grid ── */
+    .services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 20px; }
+    @media (max-width: 650px) { .services-grid { grid-template-columns: 1fr; } }
+    .service-card {
+      background: var(--bg-card); border-radius: 20px; padding: 28px 22px; text-align: center;
+      border: 1px solid var(--border-color); transition: all 0.3s;
+      position: relative; overflow: hidden;
+    }
+    .service-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 1px; background: linear-gradient(90deg, transparent, rgba(167,139,250,0.2), transparent); }
+    .service-card:hover { border-color: rgba(167,139,250,0.3); transform: translateY(-6px); box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
+    .service-card .icon {
+      width: 56px; height: 56px; border-radius: 16px; margin: 0 auto 16px;
+      background: linear-gradient(135deg, rgba(167,139,250,0.1), rgba(124,58,237,0.05));
+      display: flex; align-items: center; justify-content: center; font-size: 1.4rem; color: var(--accent);
+    }
+    .service-card h3 { color: var(--text-primary); font-size: 1rem; margin-bottom: 8px; font-weight: 700; }
+    .service-card p { color: var(--text-secondary); font-size: 0.82rem; line-height: 1.6; }
+
+    /* ── Active Nav Link ── */
+    .nav-links a.active { color: #fff; background: rgba(167,139,250,0.15); }
+
+    /* ── Testimonials ── */
+    .testimonials-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 20px; }
+    @media (max-width: 650px) { .testimonials-grid { grid-template-columns: 1fr; } }
+    .testimonial-card {
+      background: var(--bg-card); border-radius: 20px; padding: 25px;
+      border: 1px solid var(--border-color); transition: all 0.3s;
+    }
+    .testimonial-card:hover { border-color: rgba(167,139,250,0.3); transform: translateY(-4px); box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
+    .testimonial-card .stars { color: var(--gold); font-size: 0.8rem; margin-bottom: 10px; }
+    .testimonial-card blockquote { color: var(--text-secondary); font-size: 0.85rem; line-height: 1.7; font-style: italic; }
+    .testimonial-card .author { display: flex; align-items: center; gap: 10px; margin-top: 15px; }
+    .testimonial-card .author .initial {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-weight: 700; font-size: 0.85rem;
+    }
+    .testimonial-card .author .name { font-weight: 600; font-size: 0.85rem; color: var(--text-primary); }
+    .testimonial-card .author .role { font-size: 0.75rem; color: var(--text-secondary); }
+
+    /* ── Achievements ── */
+    .achievements-grid { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; justify-content: center; }
+    .achievement-badge {
+      background: linear-gradient(135deg, rgba(167,139,250,0.08), rgba(124,58,237,0.03));
+      border: 1px solid rgba(167,139,250,0.15); border-radius: 50px;
+      padding: 10px 20px; display: flex; align-items: center; gap: 10px;
+      color: var(--text-primary); font-size: 0.82rem; font-weight: 500; transition: all 0.3s;
+    }
+    .achievement-badge:hover { border-color: var(--accent); transform: scale(1.05); box-shadow: 0 0 20px rgba(167,139,250,0.1); }
+    .achievement-badge i { color: var(--gold); font-size: 1rem; }
+
+    /* ── Animated Gradient Text ── */
+    .section-title span {
+      background: linear-gradient(135deg, var(--accent), var(--gold), var(--accent));
+      background-size: 200% auto; background-clip: text; -webkit-background-clip: text; color: transparent;
+      animation: shimmer 3s ease-in-out infinite;
+    }
+    @keyframes shimmer { 0%,100%{background-position:0% center} 50%{background-position:200% center} }
+
+    /* ── Timeline ── */
+    .timeline { position: relative; margin-top: 30px; padding-left: 30px; }
+    .timeline::before {
+      content: ''; position: absolute; left: 7px; top: 8px; bottom: 8px;
+      width: 2px; background: linear-gradient(180deg, var(--primary), var(--accent), transparent);
+    }
+    .timeline-item {
+      position: relative; padding: 0 0 28px 20px;
+      opacity: 0; transform: translateX(-20px); transition: all 0.5s ease;
+    }
+    .timeline-item.visible { opacity: 1; transform: translateX(0); }
+    .timeline-item::before {
+      content: ''; position: absolute; left: -26px; top: 6px;
+      width: 12px; height: 12px; border-radius: 50%;
+      background: var(--primary); border: 3px solid var(--bg-primary);
+      box-shadow: 0 0 10px rgba(124,58,237,0.4);
+    }
+    .timeline-item .date {
+      font-size: 0.75rem; color: var(--accent); font-weight: 600; letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    .timeline-item h3 { color: var(--text-primary); font-size: 1rem; font-weight: 700; }
+    .timeline-item p { color: var(--text-secondary); font-size: 0.82rem; margin-top: 4px; line-height: 1.6; }
+
+    /* ── Staggered fade-in ── */
+    .fade-up { opacity: 0; transform: translateY(35px); transition: opacity 0.6s ease, transform 0.6s ease; }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+    ::-webkit-scrollbar { width: 7px; }
+    ::-webkit-scrollbar-track { background: var(--bg-primary); }
+    ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+    /* ── Chatbot ── */
+    .chat-btn {
+      position: fixed; bottom: 80px; right: 20px; z-index: 999;
+      width: 52px; height: 52px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff; border: none; cursor: pointer; font-size: 1.3rem;
+      box-shadow: 0 4px 20px rgba(124,58,237,0.4);
+      transition: transform 0.25s, box-shadow 0.25s;
+    }
+    .chat-btn:hover { transform: scale(1.1); box-shadow: 0 6px 30px rgba(124,58,237,0.5); }
+    .chat-window {
+      position: fixed; bottom: 80px; right: 20px; z-index: 999;
+      width: 340px; max-height: 460px; background: var(--bg-card);
+      border-radius: 20px; border: 1px solid var(--border-color);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+      display: none; flex-direction: column; overflow: hidden;
+      animation: chatSlideUp 0.3s ease;
+    }
+    .chat-window.open { display: flex; }
+    .chat-btn.hidden { display: none; }
+    @keyframes chatSlideUp { from { opacity: 0; transform: translateY(20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    .chat-header {
+      padding: 16px 20px; background: linear-gradient(135deg, var(--primary), var(--accent)); color: #fff;
+      display: flex; justify-content: space-between; align-items: center; font-weight: 700; font-size: 0.9rem;
+    }
+    .chat-header button { background: none; border: none; color: #fff; cursor: pointer; font-size: 1.2rem; opacity: 0.8; }
+    .chat-header button:hover { opacity: 1; }
+    .chat-msgs {
+      flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px;
+      scroll-behavior: smooth; min-height: 200px; max-height: 320px;
+    }
+    .chat-msg {
+      max-width: 85%; padding: 10px 14px; border-radius: 16px; font-size: 0.85rem; line-height: 1.5;
+      word-wrap: break-word; animation: msgIn 0.2s ease;
+    }
+    @keyframes msgIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .chat-msg.bot { align-self: flex-start; background: var(--bg-elevated); color: var(--text-primary); border-bottom-left-radius: 4px; border: 1px solid var(--border-color); }
+    .chat-msg.user { align-self: flex-end; background: linear-gradient(135deg, var(--primary), var(--accent)); color: #fff; border-bottom-right-radius: 4px; }
+    .chat-input-wrap {
+      padding: 12px 16px; border-top: 1px solid var(--border-color); display: flex; gap: 8px; background: var(--bg-card);
+    }
+    .chat-input-wrap input {
+      flex: 1; padding: 10px 14px; border-radius: 50px; border: 1px solid var(--border-color);
+      background: var(--bg-primary); color: var(--text-primary); font-size: 0.85rem; outline: none;
+    }
+    .chat-input-wrap input:focus { border-color: var(--accent); }
+    .chat-input-wrap button {
+      width: 40px; height: 40px; border-radius: 50%; border: none;
+      background: linear-gradient(135deg, var(--primary), var(--accent)); color: #fff; cursor: pointer; font-size: 0.9rem;
+      transition: transform 0.2s;
+    }
+    .chat-input-wrap button:hover { transform: scale(1.1); }
+    .chat-quick {
+      display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 16px 4px;
+    }
+    .chat-quick button {
+      font-size: 0.7rem; padding: 4px 10px; border-radius: 50px;
+      background: var(--bg-elevated); color: var(--text-secondary);
+      border: 1px solid var(--border-color); cursor: pointer; transition: all 0.2s;
+    }
+    .chat-quick button:hover { border-color: var(--accent); color: var(--accent); background: rgba(167,139,250,0.05); }
+    @media (max-width: 480px) {
+      .chat-window { width: calc(100vw - 40px); right: 10px; bottom: 70px; }
+      .chat-btn { right: 10px; bottom: 70px; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="starsCanvas"></canvas>
+  <div id="scrollProgress"></div>
+  <nav>
+    <div class="logo">Jonard</div>
+    <div>
+      <span class="nav-links" id="navLinks">
+        <a href="#about" data-i18n="navAbout">About</a>
+        <a href="#services" data-i18n="navServices">Services</a>
+        <a href="#projects" data-i18n="navProjects">Projects</a>
+        <a href="#skills" data-i18n="navSkills">Skills</a>
+        <a href="#experience" data-i18n="navJourney">Journey</a>
+        <a href="#testimonials" data-i18n="navTestimonials">Testimonials</a>
+        <a href="#contact" data-i18n="navContact">Contact</a>
+      </span>
+      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme" id="themeBtn"><i class="fas fa-sun"></i></button>
+      <button class="lang-toggle" onclick="toggleLang()" title="Switch Language" id="langBtn">EN</button>
+      <button class="hamburger" onclick="toggleMenu()" title="Menu"><i class="fas fa-bars"></i></button>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-content">
+      <div class="avatar-wrap">
+        <div class="avatar-ring"></div>
+        <div class="avatar">
+          <div class="avatar-inner" id="avatarInner">J</div>
+        </div>
+        <div class="avatar-status"></div>
+      </div>
+      <h1>Hi, I'm <span id="displayName">Jonard</span></h1>
+      <div class="tagline"><span id="displayTagline"></span><span id="typingCursor" style="color:var(--accent);animation:blink 0.8s step-end infinite;">|</span></div>
+      <p id="displayBio">Learning HTML, CSS, JavaScript, and backend development. Building projects one step at a time.</p>
+      <div class="hero-btns">
+        <a href="#projects" class="btn btn-primary" data-i18n="heroViewProjects"><i class="fas fa-code"></i> View Projects</a>
+        <a href="#contact" class="btn btn-secondary" data-i18n="heroContact"><i class="fas fa-envelope"></i> Contact Me</a>
+        <a href="javascript:void(0)" onclick="openResume()" class="btn btn-secondary" id="resumeBtn"><i class="fas fa-download"></i> <span data-i18n="heroResume">Resume</span></a>
+      </div>
+      <div class="hero-themes">
+        <span style="font-size:0.75rem;color:var(--text-secondary);margin-right:6px;">Theme</span>
+        <button class="hero-swatch" data-theme="purple" style="background:#7c3aed;" onclick="setColorTheme('purple')" title="Purple"></button>
+        <button class="hero-swatch" data-theme="blue" style="background:#2563eb;" onclick="setColorTheme('blue')" title="Blue"></button>
+        <button class="hero-swatch" data-theme="green" style="background:#059669;" onclick="setColorTheme('green')" title="Green"></button>
+        <button class="hero-swatch" data-theme="pink" style="background:#db2777;" onclick="setColorTheme('pink')" title="Pink"></button>
+        <button class="hero-swatch" data-theme="orange" style="background:#ea580c;" onclick="setColorTheme('orange')" title="Orange"></button>
+      </div>
+    </div>
+  </section>
+
+  <div class="container fade-in" id="about">
+    <div class="section-title"><i class="fas fa-user"></i> <span data-i18n="aboutTitle">About Me</span></div>
+    <div class="about-grid">
+      <div class="card">
+        <i class="fas fa-graduation-cap"></i>
+        <h3 data-i18n="aboutStudent">Student</h3>
+        <p data-i18n="aboutStudentDesc">Learning web development and building real-world projects to sharpen my skills.</p>
+      </div>
+      <div class="card">
+        <i class="fas fa-laptop-code"></i>
+        <h3 data-i18n="aboutDeveloper">Developer</h3>
+        <p data-i18n="aboutDeveloperDesc">Aspiring web developer focused on HTML, CSS, JavaScript, and backend technologies.</p>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat-card">
+        <div class="num">1+</div>
+        <div class="label" data-i18n="statYear">Year Learning</div>
+      </div>
+      <div class="stat-card">
+        <div class="num">2</div>
+        <div class="label" data-i18n="statProjects">Projects Built</div>
+      </div>
+      <div class="stat-card">
+        <div class="num">Ongoing</div>
+        <div class="label" data-i18n="statJourney">Learning Journey</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container fade-up" id="services">
+    <div class="section-title"><i class="fas fa-bolt"></i> <span data-i18n="servicesTitle">What I Do</span></div>
+    <div class="services-grid">
+      <div class="service-card">
+        <div class="icon"><i class="fas fa-code"></i></div>
+        <h3 data-i18n="srvWebDev">Web Development</h3>
+        <p data-i18n="srvWebDevDesc">Building responsive and modern websites using HTML, CSS, JavaScript, and backend technologies.</p>
+      </div>
+      <div class="service-card">
+        <div class="icon"><i class="fas fa-paint-brush"></i></div>
+        <h3 data-i18n="srvUIDesign">UI Design</h3>
+        <p data-i18n="srvUIDesignDesc">Designing clean, user-friendly interfaces with focus on experience and visual appeal.</p>
+      </div>
+      <div class="service-card">
+        <div class="icon"><i class="fas fa-mobile-alt"></i></div>
+        <h3 data-i18n="srvResponsive">Responsive Sites</h3>
+        <p data-i18n="srvResponsiveDesc">Creating mobile-first websites that look great on any device, from phones to desktops.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="container fade-in" id="projects">
+    <div class="section-title"><i class="fas fa-folder-open"></i> <span data-i18n="projectsTitle">Projects</span></div>
+    <div class="project-grid" id="projectsContainer"></div>
+  </div>
+
+  <div class="container fade-in" id="skills">
+    <div class="section-title"><i class="fas fa-cogs"></i> <span data-i18n="skillsTitle">Skills</span></div>
+    <div class="skills-grid">
+      <div class="skill-badge"><i class="fab fa-html5"></i> HTML</div>
+      <div class="skill-badge"><i class="fab fa-css3-alt"></i> CSS</div>
+      <div class="skill-badge"><i class="fab fa-js"></i> JavaScript</div>
+      <div class="skill-badge"><i class="fas fa-database"></i> Backend</div>
+    </div>
+    <div class="skill-bar-group">
+      <div class="skill-bar-item"><div class="info"><span>HTML</span><span>85%</span></div><div class="bar"><div class="fill" style="width:85%"></div></div></div>
+      <div class="skill-bar-item"><div class="info"><span>CSS</span><span>75%</span></div><div class="bar"><div class="fill" style="width:75%"></div></div></div>
+      <div class="skill-bar-item"><div class="info"><span>JavaScript</span><span>60%</span></div><div class="bar"><div class="fill" style="width:60%"></div></div></div>
+    </div>
+  </div>
+
+  <div class="container fade-up" id="experience">
+    <div class="section-title"><i class="fas fa-road"></i> <span data-i18n="journeyTitle">My Journey</span></div>
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="date">2025 - Present</div>
+        <h3>Learning Web Development</h3>
+        <p>Started learning HTML, CSS, JavaScript, and backend development. Building personal projects to improve skills.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="date">2024</div>
+        <h3>First Project</h3>
+        <p>Built my first Simple Login system. Got interested in how websites work behind the scenes.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="date">2023</div>
+        <h3>Started Coding</h3>
+        <p>First introduced to programming. Started exploring web development and design.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="container fade-up" id="testimonials">
+    <div class="section-title"><i class="fas fa-quote-right"></i> <span data-i18n="testimonialsTitle">Kind Words</span></div>
+    <div class="testimonials-grid">
+      <div class="testimonial-card">
+        <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+        <blockquote>"Great attention to detail. Always eager to learn and deliver clean code."</blockquote>
+        <div class="author"><div class="initial">A</div><div><div class="name">Alex</div><div class="role">Classmate</div></div></div>
+      </div>
+      <div class="testimonial-card">
+        <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
+        <blockquote>"Dedicated and passionate about web development. Always improving his craft."</blockquote>
+        <div class="author"><div class="initial">M</div><div><div class="name">Maria</div><div class="role">Mentor</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="container fade-up" id="achievements">
+    <div class="section-title"><i class="fas fa-trophy"></i> <span data-i18n="achievementsTitle">Achievements</span></div>
+    <div class="achievements-grid">
+      <div class="achievement-badge"><i class="fas fa-check-circle"></i> <span data-i18n="achProjects">Built 2+ Projects</span></div>
+      <div class="achievement-badge"><i class="fas fa-code"></i> <span data-i18n="achFullstack">Learning Full-Stack</span></div>
+      <div class="achievement-badge"><i class="fas fa-mobile-alt"></i> <span data-i18n="achResponsive">Responsive Design</span></div>
+      <div class="achievement-badge"><i class="fas fa-rocket"></i> <span data-i18n="achLearner">Continuous Learner</span></div>
+    </div>
+  </div>
+
+  <div class="container fade-in" id="contact">
+    <div class="section-title"><i class="fas fa-paper-plane"></i> <span data-i18n="contactTitle">Contact</span></div>
+    <div class="contact-section">
+      <h2 data-i18n="contactHeading">Let's Connect!</h2>
+      <p data-i18n="contactSub">Have a question or just want to say hi?</p>
+      <div class="contact-links">
+        <a href="mailto:yourname@gmail.com" class="contact-link" id="contactEmail">
+          <i class="fas fa-envelope"></i>
+          <span class="handle" data-i18n="contactEmail">Email Me</span>
+        </a>
+        <a href="#" class="contact-link" id="contactFb" style="display:none;">
+          <i class="fab fa-facebook"></i>
+          <span class="handle">Facebook</span>
+        </a>
+        <a href="#" class="contact-link" id="contactTt" style="display:none;">
+          <i class="fab fa-tiktok"></i>
+          <span class="handle">TikTok</span>
+        </a>
+        <a href="#" class="contact-link" id="contactGithub">
+          <i class="fab fa-github"></i>
+          <span class="handle">GitHub</span>
+        </a>
+      </div>
+      <div class="contact-links" id="customLinksContainer" style="margin-top:15px;"></div>
+      <div style="margin-top:30px;border-top:1px solid var(--border-color);padding-top:25px;">
+        <h3 style="color:var(--text-primary);margin-bottom:15px;" data-i18n="contactFormTitle">Send a Message</h3>
+        <form id="contactForm" onsubmit="return sendMessage(event)" style="display:flex;flex-direction:column;gap:12px;max-width:400px;margin:0 auto;">
+          <input type="text" id="contactName" data-i18n-placeholder="contactNamePlaceholder" placeholder="Your name" required style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border-color);background:var(--bg-elevated);color:var(--text-primary);font-size:0.85rem;outline:none;transition:border-color 0.3s;">
+          <input type="email" id="contactEmailInput" data-i18n-placeholder="contactEmailPlaceholder" placeholder="Your email" required style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border-color);background:var(--bg-elevated);color:var(--text-primary);font-size:0.85rem;outline:none;transition:border-color 0.3s;">
+          <textarea id="contactMessage" rows="3" data-i18n-placeholder="contactMsgPlaceholder" placeholder="Your message" required style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--border-color);background:var(--bg-elevated);color:var(--text-primary);font-size:0.85rem;outline:none;resize:vertical;font-family:inherit;transition:border-color 0.3s;"></textarea>
+          <button type="submit" class="btn btn-primary" style="border:none;cursor:pointer;justify-content:center;" data-i18n="contactSendBtn"><i class="fas fa-paper-plane"></i> Send</button>
+          <div id="contactMsg" style="font-size:0.85rem;display:none;"></div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <button id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fas fa-arrow-up"></i></button>
+  <div class="social-float" id="socialFloat"></div>
+  <button class="settings-btn" onclick="openSettings()" title="Settings"><i class="fas fa-cog"></i></button>
+  <div class="settings-overlay" id="settingsOverlay" onclick="closeSettings()"></div>
+  <div class="settings-panel" id="settingsPanel">
+    <h3><i class="fas fa-cog"></i> <span data-i18n="settingsTitle">Settings</span></h3>
+    <label data-i18n="settingsTheme">Theme</label>
+    <button class="save-btn" onclick="toggleTheme();" id="settingsThemeBtn" style="margin-top:0;margin-bottom:15px;"><i class="fas fa-palette"></i> <span id="settingsThemeLabel">Switch to Light Mode</span></button>
+    <label data-i18n="settingsColorTheme" style="font-size:0.75rem;color:var(--text-secondary);">Color Theme</label>
+    <div style="display:flex;gap:8px;margin-bottom:15px;flex-wrap:wrap;">
+      <button class="color-swatch" data-theme="purple" style="background:#7c3aed;" onclick="setColorTheme('purple')" title="Purple"></button>
+      <button class="color-swatch" data-theme="blue" style="background:#2563eb;" onclick="setColorTheme('blue')" title="Blue"></button>
+      <button class="color-swatch" data-theme="green" style="background:#059669;" onclick="setColorTheme('green')" title="Green"></button>
+      <button class="color-swatch" data-theme="pink" style="background:#db2777;" onclick="setColorTheme('pink')" title="Pink"></button>
+      <button class="color-swatch" data-theme="orange" style="background:#ea580c;" onclick="setColorTheme('orange')" title="Orange"></button>
+    </div>
+    <label data-i18n="settingsPhoto">Profile Photo</label>
+    <input type="file" id="photoInput" accept="image/*">
+    <label data-i18n="settingsName">Display Name</label>
+    <input type="text" id="nameInput" placeholder="Your name">
+    <label data-i18n="settingsTagline">Tagline</label>
+    <input type="text" id="taglineInput" data-i18n-placeholder="settingsTaglinePlaceholder" placeholder="Web Developer & Programmer">
+    <label data-i18n="settingsBio">Bio</label>
+    <input type="text" id="bioInput" data-i18n-placeholder="settingsBioPlaceholder" placeholder="Short bio">
+    <label data-i18n="settingsEmail">Email</label>
+    <input type="email" id="emailInput" placeholder="email@example.com">
+    <label style="margin-top:12px;border-top:1px solid var(--border-color);padding-top:12px;font-size:0.8rem;color:var(--text-secondary);">Social Media Links</label>
+    <label style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:4px;">Facebook</label>
+    <input type="url" id="fbInput" placeholder="https://facebook.com/yourname">
+    <label style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:4px;">Instagram</label>
+    <input type="url" id="igInput" placeholder="https://instagram.com/yourname">
+    <label style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:4px;">Twitter / X</label>
+    <input type="url" id="twInput" placeholder="https://twitter.com/yourname">
+    <label style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:4px;">LinkedIn</label>
+    <input type="url" id="liInput" placeholder="https://linkedin.com/in/yourname">
+    <label style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:4px;">TikTok</label>
+    <input type="url" id="ttInput" placeholder="https://tiktok.com/@yourname">
+    <label style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:4px;">YouTube</label>
+    <input type="url" id="ytInput" placeholder="https://youtube.com/@yourchannel">
+    <label data-i18n="settingsGithub">GitHub URL</label>
+    <input type="url" id="githubInput" placeholder="https://github.com/username">
+    <label>Resume/CV URL</label>
+    <input type="url" id="resumeInput" placeholder="https://your-resume-link.com">
+    <label>Projects <small style="color:var(--text-secondary);font-size:0.7rem;">(one per line: Name|Description|Techs|URL)</small></label>
+    <textarea id="projectsInput" rows="4" placeholder="Simple Login|A login system|HTML,CSS,JavaScript|https://github.com/user/repo" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border-color);background:var(--bg-primary);color:var(--text-primary);font-size:0.85rem;resize:vertical;font-family:inherit;transition:background 0.3s,color 0.3s,border-color 0.3s;"></textarea>
+    <label>Custom Links <small style="color:var(--text-secondary);font-size:0.7rem;">(one per line: Label|URL)</small></label>
+    <textarea id="linksInput" rows="4" placeholder="Facebook|https://facebook.com/yourname&#10;YouTube|https://youtube.com/@yourchannel" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border-color);background:var(--bg-primary);color:var(--text-primary);font-size:0.85rem;resize:vertical;font-family:inherit;transition:background 0.3s,color 0.3s,border-color 0.3s;"></textarea>
+    <button class="save-btn" onclick="saveSettings()"><i class="fas fa-check"></i> <span data-i18n="settingsSaveBtn">Save</span></button>
+    <label style="margin-top:15px;border-top:1px solid var(--border-color);padding-top:15px;" data-i18n="settingsPassword">Settings Password</label>
+    <input type="password" id="pwdSetInput" data-i18n-placeholder="settingsPasswordPlaceholder" placeholder="Leave blank to remove password">
+    <div style="display:flex;gap:10px;margin-top:15px;">
+      <button class="save-btn" onclick="exportData()" style="background:var(--bg-elevated);border:1px solid var(--border-color);font-size:0.8rem;"><i class="fas fa-download"></i> <span data-i18n="settingsExport">Export</span></button>
+      <button class="save-btn" onclick="document.getElementById('importFile').click()" style="background:var(--bg-elevated);border:1px solid var(--border-color);font-size:0.8rem;"><i class="fas fa-upload"></i> <span data-i18n="settingsImport">Import</span></button>
+      <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(event)">
+    </div>
+  </div>
+
+  <div class="pwd-overlay" id="pwdOverlay">
+    <div class="pwd-box">
+      <h3>🔒 <span data-i18n="pwdTitle">Settings Locked</span></h3>
+      <p data-i18n="pwdSub">Enter password to access settings</p>
+      <input type="password" id="pwdInput" data-i18n-placeholder="pwdPlaceholder" placeholder="Enter password" onkeydown="if(event.key==='Enter')pwdSubmit()">
+      <div class="pwd-actions">
+        <button class="pwd-cancel" onclick="pwdCancel()" data-i18n="pwdCancel">Cancel</button>
+        <button class="pwd-submit" onclick="pwdSubmit()" data-i18n="pwdUnlock">Unlock</button>
+      </div>
+      <div id="pwdError" style="color:#ef4444;font-size:0.8rem;margin-top:10px;display:none;" data-i18n="pwdError">Wrong password</div>
+    </div>
+  </div>
+
+  <button class="chat-btn" id="chatBtn" onclick="toggleChat()"><i class="fas fa-comment-dots"></i></button>
+  <div class="chat-window" id="chatWindow">
+    <div class="chat-header">
+      <span><i class="fas fa-robot"></i> <span data-i18n="chatHeader">Portfolio Assistant</span></span>
+      <button onclick="toggleChat()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="chat-msgs" id="chatMsgs"></div>
+    <div class="chat-quick" id="chatQuick">
+      <button onclick="quickChat('skills')">Skills</button>
+      <button onclick="quickChat('projects')">Projects</button>
+      <button onclick="quickChat('contact')">Contact</button>
+      <button onclick="quickChat('resume')">Resume</button>
+    </div>
+    <div class="chat-input-wrap">
+      <input type="text" id="chatInput" data-i18n-placeholder="chatPlaceholder" placeholder="Ask me anything..." onkeydown="if(event.key==='Enter')sendChat()">
+      <button onclick="sendChat()"><i class="fas fa-paper-plane"></i></button>
+    </div>
+  </div>
+
+  <footer>
+    <div style="display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap;">
+      <span><i class="fas fa-heart" style="color: #ef4444;"></i> <span data-i18n="footerText">Built with passion by Jonard &copy; 2026</span></span>
+      <span style="color:var(--text-secondary);">·</span>
+      <span id="liveClock" style="font-family:monospace;color:var(--text-secondary);font-size:0.85rem;"><i class="far fa-clock"></i> <span id="clockTime"></span></span>
+    </div>
+  </footer>
+
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script>
+    (function() { applySettings(); applyTheme(); })();
+    let db, SETTINGS_DOC;
+    try {
+      if (typeof firebase !== 'undefined') {
+        firebase.initializeApp({
+          apiKey: "AIzaSyAzfUJK9GpYqpLyMBKehZzQnIYcXQvwPBI",
+          authDomain: "portfolio-6cc48.firebaseapp.com",
+          projectId: "portfolio-6cc48",
+          storageBucket: "portfolio-6cc48.firebasestorage.app",
+          messagingSenderId: "492767064062",
+          appId: "1:492767064062:web:15745d48287a1ab7489aaf",
+          measurementId: "G-P36ZVZRGB4"
+        });
+        db = firebase.firestore();
+        SETTINGS_DOC = db.collection('settings').doc('portfolio');
+      }
+    } catch(e) { console.log('Firebase init error'); }
+    function toggleTheme() {
+      const b = document.body; b.classList.toggle('light-mode');
+      const isLight = b.classList.contains('light-mode');
+      localStorage.setItem('theme', isLight ? 'light' : 'dark');
+      updateThemeUI(isLight);
+    }
+    function updateThemeUI(isLight) {
+      document.getElementById('themeBtn').innerHTML = isLight ? '<i class="fas fa-moon"></i>' : '<i class="fas fa-sun"></i>';
+      const stl = document.getElementById('settingsThemeLabel');
+      if (stl) stl.textContent = isLight ? 'Switch to Dark Mode' : 'Switch to Light Mode';
+    }
+    function applyTheme() {
+      const isLight = localStorage.getItem('theme') === 'light';
+      document.body.classList.toggle('light-mode', isLight);
+      updateThemeUI(isLight);
+      applyColorTheme();
+    }
+    function setColorTheme(t) {
+      localStorage.setItem('colorTheme', t);
+      applyColorTheme(t);
+    }
+    function applyColorTheme(t) {
+      t = t || localStorage.getItem('colorTheme') || 'purple';
+      const themes = {
+        purple: { p: '#7c3aed', a: '#a78bfa', g: '#f59e0b' },
+        blue: { p: '#2563eb', a: '#60a5fa', g: '#f59e0b' },
+        green: { p: '#059669', a: '#34d399', g: '#f59e0b' },
+        pink: { p: '#db2777', a: '#f472b6', g: '#f59e0b' },
+        orange: { p: '#ea580c', a: '#fb923c', g: '#f59e0b' },
+      };
+      const c = themes[t] || themes.purple;
+      document.documentElement.style.setProperty('--primary', c.p);
+      document.documentElement.style.setProperty('--accent', c.a);
+      document.documentElement.style.setProperty('--gold', c.g);
+      document.querySelectorAll('.color-swatch, .hero-swatch').forEach(b => b.classList.toggle('active', b.dataset.theme === t));
+      // Update rgba shadows that can't use CSS variables directly
+      const s = document.getElementById('themeRgba') || document.createElement('style');
+      s.id = 'themeRgba';
+      const pRgb = c.p === '#7c3aed' ? '124,58,237' : parseInt(c.p.slice(1,3),16)+','+parseInt(c.p.slice(3,5),16)+','+parseInt(c.p.slice(5,7),16);
+      const aRgb = c.a === '#a78bfa' ? '167,139,250' : parseInt(c.a.slice(1,3),16)+','+parseInt(c.a.slice(3,5),16)+','+parseInt(c.a.slice(5,7),16);
+      s.textContent = `
+        nav .logo { text-shadow: 0 0 15px rgba(${aRgb},0.2) !important; }
+        .hero { background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(${aRgb},0.08) 0%, transparent 70%), radial-gradient(ellipse 80% 50% at 50% 120%, rgba(245,158,11,0.05) 0%, transparent 70%) !important; }
+        .hero h1 { text-shadow: 0 0 30px rgba(${aRgb},0.15) !important; }
+        .hero .tagline { text-shadow: 0 0 20px rgba(${aRgb},0.15) !important; }
+        .btn-primary { box-shadow: 0 4px 20px rgba(${pRgb},0.3) !important; }
+        .btn-primary:hover { box-shadow: 0 8px 30px rgba(${aRgb},0.4), 0 0 60px rgba(${aRgb},0.15) !important; }
+        .section-title i { filter: drop-shadow(0 0 6px rgba(${aRgb},0.3)) !important; }
+        .card:hover { box-shadow: 0 12px 40px rgba(0,0,0,0.3), 0 0 20px rgba(${aRgb},0.08) !important; }
+        .project-card:hover { box-shadow: 0 8px 30px rgba(0,0,0,0.3), 0 0 0 1px rgba(${aRgb},0.05) !important; }
+        .service-card:hover { box-shadow: 0 12px 40px rgba(0,0,0,0.3), 0 0 30px rgba(${aRgb},0.08) !important; }
+        @keyframes neonPulse { 0%,100%{box-shadow:0 0 20px rgba(${aRgb},0.15),0 0 60px rgba(${aRgb},0.05)} 50%{box-shadow:0 0 30px rgba(${aRgb},0.3),0 0 80px rgba(${aRgb},0.1)} }
+        .avatar { box-shadow: 0 0 30px rgba(${aRgb},0.2), 0 0 60px rgba(${aRgb},0.08) !important; }
+        .achievement-badge { box-shadow: 0 0 15px rgba(${aRgb},0.15), 0 0 40px rgba(${aRgb},0.05) !important; }
+      `;
+      if (!s.parentNode) document.head.appendChild(s);
+    }
+    document.querySelectorAll('.nav-links a').forEach(a => a.addEventListener('click', () => document.getElementById('navLinks').classList.remove('open')));
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          if (e.target.classList.contains('timeline')) {
+            e.target.querySelectorAll('.timeline-item').forEach((item, i) => {
+              setTimeout(() => item.classList.add('visible'), i * 150);
+            });
+          }
+        }
+      });
+    }, { threshold: 0.1 });
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+      document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+      document.querySelectorAll('.timeline').forEach(el => observer.observe(el));
+    });
+
+    /* ── Twinkling Stars ── */
+    const starsCanvas = document.getElementById('starsCanvas');
+    const sCtx = starsCanvas.getContext('2d');
+    let starW, starH;
+    function resizeStars() { starW = starsCanvas.width = window.innerWidth; starH = starsCanvas.height = window.innerHeight; }
+    resizeStars();
+    window.addEventListener('resize', resizeStars);
+    class Star {
+      constructor() { this.reset(); }
+      reset() {
+        this.x = Math.random() * starW; this.y = Math.random() * starH;
+        this.r = Math.random() * 2 + 0.3;
+        this.baseAlpha = Math.random() * 0.7 + 0.3;
+        this.alpha = this.baseAlpha; this.speed = Math.random() * 0.02 + 0.005;
+        this.dir = Math.random() > 0.5 ? 1 : -1;
+      }
+      update() {
+        this.alpha += this.speed * this.dir;
+        if (this.alpha > 1 || this.alpha < 0.1) this.dir *= -1;
+      }
+      draw() {
+        sCtx.beginPath(); sCtx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+        sCtx.fillStyle = `rgba(255,255,255,${this.alpha})`; sCtx.fill();
+      }
+    }
+    const stars = [];
+    for (let i = 0; i < 200; i++) stars.push(new Star());
+    function animateStars() {
+      sCtx.clearRect(0, 0, starW, starH);
+      stars.forEach(s => { s.update(); s.draw(); });
+      requestAnimationFrame(animateStars);
+    }
+    animateStars();
+
+    let typed = false;
+    function typeTagline() {
+      if (typed) return; typed = true;
+      const el = document.getElementById('displayTagline');
+      const cursor = document.getElementById('typingCursor');
+      const text = el.textContent; el.textContent = '';
+      let i = 0;
+      function tick() {
+        if (i < text.length) { el.textContent += text[i]; i++; setTimeout(tick, 50 + Math.random() * 80); }
+        else { cursor.style.display = 'inline'; }
+      }
+      tick();
+    }
+    setTimeout(typeTagline, 500);
+
+    function openResume() {
+      const s = JSON.parse(localStorage.getItem('profileSettings') || '{}');
+      if (s.resume) { let r = s.resume; if (!r.startsWith('http://') && !r.startsWith('https://')) r = 'https://' + r; window.open(r, '_blank'); }
+      else { openSettings(); document.getElementById('resumeInput').focus(); }
+    }
+    function exportData() {
+      const data = {};
+      ['profileSettings','settingsPassword','theme'].forEach(k => { const v = localStorage.getItem(k); if (v) data[k] = v; });
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'portfolio-backup.json'; a.click();
+    }
+    function importData(e) {
+      const file = e.target.files[0]; if (!file) return;
+      const r = new FileReader();
+      r.onload = function() {
+        try {
+          const data = JSON.parse(r.result);
+          Object.keys(data).forEach(k => localStorage.setItem(k, data[k]));
+          alert('Imported! Reloading...');
+          location.reload();
+        } catch { alert('Invalid file'); }
+      };
+      r.readAsText(file);
+    }
+
+    const skillObs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { e.target.querySelectorAll('.fill').forEach(f => { f.style.width = f.getAttribute('data-width') || f.style.width; }); }
+      });
+    }, { threshold: 0.3 });
+    document.querySelectorAll('.skill-bar-group').forEach(el => skillObs.observe(el));
+    document.querySelectorAll('.fill').forEach(f => { f.setAttribute('data-width', f.style.width); f.style.width = '0'; });
+    setTimeout(() => document.querySelectorAll('.fill').forEach(f => { f.style.width = f.getAttribute('data-width'); }), 100);
+
+    const countObs = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        e.target.querySelectorAll('.num').forEach(el => {
+          const txt = el.textContent; const num = parseInt(txt);
+          if (isNaN(num)) return;
+          el.textContent = '0';
+          let c = 0; const t = setInterval(() => { c++; el.textContent = c + '+'; if (c >= num) { clearInterval(t); el.textContent = txt; } }, 40);
+        });
+        countObs.unobserve(e.target);
+      });
+    }, { threshold: 0.3 });
+    document.querySelectorAll('.stats').forEach(el => countObs.observe(el));
+
+    window.addEventListener('scroll', () => {
+      const s = window.scrollY, h = document.documentElement.scrollHeight - window.innerHeight;
+      document.getElementById('backToTop').classList.toggle('show', s > 400);
+      document.getElementById('scrollProgress').style.width = h > 0 ? (s / h * 100) + '%' : '0%';
+      document.querySelectorAll('.nav-links a').forEach(a => {
+        const sec = document.querySelector(a.getAttribute('href'));
+        a.classList.toggle('active', sec && s >= sec.offsetTop - 200 && s < sec.offsetTop + sec.offsetHeight - 200);
+      });
+    });
+    let settingsUnlocked = false;
+    function openSettings() {
+      const pwd = localStorage.getItem('settingsPassword');
+      if (pwd && !settingsUnlocked) { document.getElementById('pwdOverlay').classList.add('show'); document.getElementById('pwdInput').value = ''; document.getElementById('pwdError').style.display = 'none'; document.getElementById('pwdInput').focus(); }
+      else { document.getElementById('settingsPanel').classList.add('open'); document.getElementById('settingsOverlay').classList.add('show'); }
+    }
+    function pwdSubmit() {
+      const pwd = localStorage.getItem('settingsPassword');
+      if (document.getElementById('pwdInput').value === pwd) {
+        settingsUnlocked = true;
+        document.getElementById('pwdOverlay').classList.remove('show');
+        document.getElementById('settingsPanel').classList.add('open'); document.getElementById('settingsOverlay').classList.add('show');
+      } else { document.getElementById('pwdError').style.display = 'block'; }
+    }
+    function pwdCancel() { document.getElementById('pwdOverlay').classList.remove('show'); }
+    function closeSettings() { document.getElementById('settingsPanel').classList.remove('open'); document.getElementById('settingsOverlay').classList.remove('show'); }
+    async function saveSettings() {
+      const s = {};
+      ['name','tagline','bio','email','github','resume','fb','ig','tw','li','tt','yt'].forEach(k => { const v = document.getElementById(k+'Input').value; if (v) s[k] = v; });
+      const projectsRaw = document.getElementById('projectsInput').value;
+      if (projectsRaw.trim()) s.projects = projectsRaw;
+      const linksRaw = document.getElementById('linksInput').value;
+      if (linksRaw.trim()) s.links = linksRaw;
+      const pwdSet = document.getElementById('pwdSetInput').value;
+      if (pwdSet) { localStorage.setItem('settingsPassword', pwdSet); s.password = pwdSet; }
+      else { localStorage.removeItem('settingsPassword'); s.password = ''; }
+      const file = document.getElementById('photoInput').files[0];
+      const saveToCloud = async () => { try { if (SETTINGS_DOC) await SETTINGS_DOC.set(s); } catch(e){} };
+      if (file) {
+        const r = new FileReader();
+        r.onload = async e => {
+          s.photo = e.target.result;
+          localStorage.setItem('profileSettings', JSON.stringify(s));
+          await saveToCloud();
+          applySettings(); closeSettings();
+        };
+        r.readAsDataURL(file);
+      } else {
+        localStorage.setItem('profileSettings', JSON.stringify(s));
+        await saveToCloud();
+        applySettings(); closeSettings();
+      }
+    }
+    async function applySettings() {
+      try {
+        if (SETTINGS_DOC) {
+          const doc = await SETTINGS_DOC.get();
+          if (doc.exists) {
+            const cloud = doc.data();
+            if (cloud.password) localStorage.setItem('settingsPassword', cloud.password);
+            localStorage.setItem('profileSettings', JSON.stringify(cloud));
+          }
+        }
+      } catch(e) {}
+      const s = JSON.parse(localStorage.getItem('profileSettings') || '{}');
+      fillSettings(s);
+      renderSocialIcons(s);
+    }
+    function fillSettings(s) {
+      if (s.name) { document.getElementById('displayName').textContent = s.name; document.getElementById('nameInput').value = s.name; }
+      if (s.tagline) { document.getElementById('displayTagline').textContent = s.tagline; document.getElementById('taglineInput').value = s.tagline; } else { document.getElementById('displayTagline').textContent = 'Web Developer & Programmer'; }
+      if (s.bio) { document.getElementById('displayBio').textContent = s.bio; document.getElementById('bioInput').value = s.bio; }
+      if (s.email) { let e = s.email; if (!e.includes('@')) e = e + '@gmail.com'; document.getElementById('contactEmail').href = 'mailto:'+e; document.getElementById('emailInput').value = s.email; }
+      if (s.github) { let g = s.github; if (!g.startsWith('http://') && !g.startsWith('https://')) g = 'https://' + g; document.getElementById('contactGithub').href = g; document.getElementById('githubInput').value = s.github; }
+      if (s.fb) { let f = s.fb; if (!f.startsWith('http://') && !f.startsWith('https://')) f = 'https://' + f; document.getElementById('contactFb').href = f; document.getElementById('contactFb').style.display = ''; } else { document.getElementById('contactFb').style.display = 'none'; }
+      if (s.tt) { let t = s.tt; if (!t.startsWith('http://') && !t.startsWith('https://')) t = 'https://' + t; document.getElementById('contactTt').href = t; document.getElementById('contactTt').style.display = ''; } else { document.getElementById('contactTt').style.display = 'none'; }
+      ['fb','ig','tw','li','tt','yt'].forEach(k => { const v = s[k]; const el = document.getElementById(k+'Input'); if (v) el.value = v; });
+      if (s.resume) { document.getElementById('resumeInput').value = s.resume; }
+      if (s.password) { localStorage.setItem('settingsPassword', s.password); document.getElementById('pwdSetInput').value = s.password; }
+      else {
+        const savedPwd = localStorage.getItem('settingsPassword');
+        if (savedPwd) document.getElementById('pwdSetInput').value = savedPwd;
+      }
+      if (s.photo) { document.getElementById('avatarInner').innerHTML = '<img src="'+s.photo+'" alt="Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">'; }
+      if (s.projects) document.getElementById('projectsInput').value = s.projects;
+      if (s.links) document.getElementById('linksInput').value = s.links;
+      renderProjects(s.projects);
+      renderCustomLinks(s.links);
+      renderSocialIcons(s);
+    }
+    function renderSocialIcons(s) {
+      s = s || JSON.parse(localStorage.getItem('profileSettings') || '{}');
+      const c = document.getElementById('socialFloat');
+      c.innerHTML = '';
+      const items = [
+        { key: 'fb', icon: 'fab fa-facebook', title: 'Facebook' },
+        { key: 'ig', icon: 'fab fa-instagram', title: 'Instagram' },
+        { key: 'tw', icon: 'fab fa-x-twitter', title: 'Twitter' },
+        { key: 'li', icon: 'fab fa-linkedin', title: 'LinkedIn' },
+        { key: 'tt', icon: 'fab fa-tiktok', title: 'TikTok' },
+        { key: 'yt', icon: 'fab fa-youtube', title: 'YouTube' },
+        { key: 'github', icon: 'fab fa-github', title: 'GitHub' },
+      ];
+      items.forEach(item => {
+        let url = s[item.key];
+        if (!url) return;
+        if (!url.startsWith('http://') && !url.startsWith('https://')) url = 'https://' + url;
+        const a = document.createElement('a');
+        a.href = url; a.target = '_blank'; a.rel = 'noopener'; a.title = item.title;
+        a.innerHTML = '<i class="' + item.icon + '"></i>';
+        c.appendChild(a);
+      });
+      if (s.email) {
+        let e = s.email;
+        if (!e.includes('@')) e = e + '@gmail.com';
+        const a = document.createElement('a');
+        a.href = 'mailto:' + e; a.title = 'Email';
+        a.innerHTML = '<i class="fas fa-envelope"></i>';
+        c.appendChild(a);
+      }
+    }
+    async function applySettings() {
+      try {
+        if (SETTINGS_DOC) {
+          const doc = await SETTINGS_DOC.get();
+          if (doc.exists) {
+            const cloud = doc.data();
+            if (cloud.password) localStorage.setItem('settingsPassword', cloud.password);
+            localStorage.setItem('profileSettings', JSON.stringify(cloud));
+          }
+        }
+      } catch(e) {}
+      const s = JSON.parse(localStorage.getItem('profileSettings') || '{}');
+      fillSettings(s);
+      renderSocialIcons(s);
+    }
+    function linkIcon(label, url) {
+      if (url && !url.startsWith('http://') && !url.startsWith('https://')) url = 'https://' + url;
+      const u = (label + url).toLowerCase();
+      if (u.includes('facebook')||u.includes('fb.com')) return 'fab fa-facebook';
+      if (u.includes('youtube')||u.includes('youtu')) return 'fab fa-youtube';
+      if (u.includes('twitter')||u.includes('x.com')) return 'fab fa-x-twitter';
+      if (u.includes('instagram')) return 'fab fa-instagram';
+      if (u.includes('linkedin')) return 'fab fa-linkedin';
+      if (u.includes('tiktok')) return 'fab fa-tiktok';
+      if (u.includes('discord')) return 'fab fa-discord';
+      if (u.includes('twitch')) return 'fab fa-twitch';
+      if (u.includes('telegram')) return 'fab fa-telegram';
+      if (u.includes('reddit')) return 'fab fa-reddit';
+      if (u.includes('spotify')) return 'fab fa-spotify';
+      if (u.includes('github')) return 'fab fa-github';
+      return 'fas fa-link';
+    }
+    function renderCustomLinks(linksStr) {
+      const c = document.getElementById('customLinksContainer');
+      c.innerHTML = '';
+      if (!linksStr) return;
+      linksStr.split('\n').forEach(line => {
+        line = line.trim(); if (!line) return;
+        const sep = line.indexOf('|');
+        if (sep === -1) return;
+        const label = line.slice(0, sep).trim();
+        const url = line.slice(sep + 1).trim();
+        if (!label || !url) return;
+        if (!url.startsWith('http://') && !url.startsWith('https://')) url = 'https://' + url;
+        const a = document.createElement('a');
+        a.href = url; a.target = '_blank'; a.rel = 'noopener';
+        a.className = 'contact-link';
+        a.innerHTML = `<i class="${linkIcon(label, url)}"></i><span class="handle">${label}</span>`;
+        c.appendChild(a);
+      });
+    }
+    function renderProjects(projectsStr) {
+      const c = document.getElementById('projectsContainer');
+      c.innerHTML = '';
+      const defaults = [
+        { name: 'Simple Login', desc: 'A login system built with HTML, CSS, and JavaScript.', techs: ['HTML','CSS','JavaScript'], url: '' },
+        { name: 'Portfolio Website', desc: 'My personal portfolio showcasing my skills and projects.', techs: ['HTML','CSS','JavaScript'], url: '' }
+      ];
+      if (!projectsStr) {
+        defaults.forEach(p => { c.appendChild(createProjectCard(p)); });
+        return;
+      }
+      const lines = projectsStr.split('\n').filter(l => l.trim());
+      if (lines.length === 0) { defaults.forEach(p => c.appendChild(createProjectCard(p))); return; }
+      lines.forEach(line => {
+        const parts = line.split('|').map(s => s.trim());
+        const name = parts[0] || 'Project';
+        const desc = parts[1] || '';
+        const techs = parts[2] ? parts[2].split(',').map(t => t.trim()) : [];
+        const url = parts[3] || '';
+        c.appendChild(createProjectCard({ name, desc, techs, url }));
+      });
+    }
+    function createProjectCard(p) {
+      let url = p.url;
+      if (url && !url.startsWith('http://') && !url.startsWith('https://')) url = 'https://' + url;
+      const el = document.createElement(url ? 'a' : 'div');
+      el.className = 'project-card';
+      if (url) { el.href = url; el.target = '_blank'; el.rel = 'noopener'; }
+      let html = `<h3>${p.name}</h3><p>${p.desc}</p>`;
+      if (p.techs.length) {
+        html += '<div class="tech">' + p.techs.map(t => `<span>${t}</span>`).join('') + '</div>';
+      }
+      el.innerHTML = html;
+      return el;
+    }
+    document.getElementById('photoInput').addEventListener('change', function() {
+      const r = new FileReader();
+      r.onload = e => { document.getElementById('avatarInner').innerHTML = '<img src="'+e.target.result+'" alt="Profile" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">'; };
+      if (this.files[0]) r.readAsDataURL(this.files[0]);
+    });
+    function startClock() {
+      function tick() {
+        const d = new Date();
+        document.getElementById('clockTime').textContent = d.toLocaleTimeString('en-PH', { hour12: true });
+      }
+      tick(); setInterval(tick, 1000);
+    }
+    startClock();
+    async function sendMessage(e) {
+      e.preventDefault();
+      const data = {
+        name: document.getElementById('contactName').value,
+        email: document.getElementById('contactEmailInput').value,
+        message: document.getElementById('contactMessage').value,
+        date: new Date().toISOString()
+      };
+      const msgs = JSON.parse(localStorage.getItem('contactMessages') || '[]');
+      msgs.push(data);
+      localStorage.setItem('contactMessages', JSON.stringify(msgs));
+      try { if (db) await db.collection('contacts').add(data); } catch(e) {}
+      const msg = document.getElementById('contactMsg');
+      msg.style.display = 'block'; msg.style.color = '#22c55e';
+      msg.textContent = 'Message sent!';
+      document.getElementById('contactForm').reset();
+      return false;
+    }
+
+    /* ── Chatbot ── */
+    const faq = [
+      { kw: ['hi','hello','hey','good morning','good evening'], ans: "Hey there! 👋 I'm Jonard's virtual assistant. Ask me about his skills, projects, experience, or how to contact him!" },
+      { kw: ['skill','tech','technology','stack','language','programming'], ans: "Jonard is learning web development: HTML, CSS, JavaScript, and backend technologies. He's building real-world projects to sharpen his skills." },
+      { kw: ['project','build','portfolio','work'], ans: "Jonard builds web projects like login systems, simple apps, and this portfolio! Check the Projects section above for details." },
+      { kw: ['contact','email','message','reach','hire'], ans: "You can reach Jonard through the Contact form below, or email him directly. Just scroll down to the Contact section!" },
+      { kw: ['resume','cv','download'], ans: 'Jonard has a resume available for download. Click the "Resume" button in the hero section or check the settings to add a resume link!' },
+      { kw: ['experience','journey','background','history','timeline'], ans: "Jonard started with basic HTML/CSS and is now building full projects. Check the Journey section to see his timeline!" },
+      { kw: ['service','offer','freelance'], ans: "Jonard offers web development services including building websites, landing pages, and simple web apps. Check the Services section!" },
+      { kw: ['education','study','school','student','learn'], ans: "Jonard is a student passionate about web development. He learns by building real projects and experimenting with code." },
+      { kw: ['testimonial','review','feedback'], ans: "Check the Testimonials section to see what people say about Jonard's work!" },
+    ];
+    function toggleChat() {
+      const w = document.getElementById('chatWindow'), b = document.getElementById('chatBtn');
+      w.classList.toggle('open'); b.classList.toggle('hidden');
+      if (w.classList.contains('open') && !w.dataset.init) {
+        w.dataset.init = '1';
+        addMsg('bot', "👋 Hi! I'm here to help. Ask me about Jonard's skills, projects, contact info, and more!");
+      }
+    }
+    function addMsg(who, text) {
+      const c = document.getElementById('chatMsgs');
+      const m = document.createElement('div');
+      m.className = 'chat-msg ' + who;
+      m.textContent = text;
+      c.appendChild(m);
+      c.scrollTop = c.scrollHeight;
+    }
+    function sendChat() {
+      const inp = document.getElementById('chatInput');
+      const txt = inp.value.trim();
+      if (!txt) return;
+      addMsg('user', txt);
+      inp.value = '';
+      setTimeout(() => {
+        const lower = txt.toLowerCase();
+        for (const q of faq) {
+          if (q.kw.some(k => lower.includes(k))) {
+            addMsg('bot', q.ans); return;
+          }
+        }
+        addMsg('bot', 'Sorry, I don\'t have info on that yet. Try asking about skills, projects, contact, resume, or experience! 🙂');
+      }, 400);
+    }
+    function quickChat(topic) {
+      addMsg('user', topic);
+      document.getElementById('chatInput').value = '';
+      setTimeout(() => {
+        const lower = topic.toLowerCase();
+        for (const q of faq) {
+          if (q.kw.some(k => lower.includes(k))) {
+            addMsg('bot', q.ans); return;
+          }
+        }
+      }, 400);
+    }
+    function toggleLang() {
+      const next = localStorage.getItem('lang') === 'tl' ? 'en' : 'tl';
+      localStorage.setItem('lang', next);
+      applyLang(next);
+      document.getElementById('langBtn').textContent = next === 'tl' ? 'TL' : 'EN';
+    }
+    function applyLang(lang) {
+      lang = lang || localStorage.getItem('lang') || 'en';
+      const t = {
+        en: {
+          navAbout:'About', navServices:'Services', navProjects:'Projects', navSkills:'Skills',
+          navJourney:'Journey', navTestimonials:'Testimonials', navContact:'Contact',
+          heroViewProjects:'View Projects', heroContact:'Contact Me', heroResume:'Resume',
+          aboutTitle:'About Me', aboutStudent:'Student',
+          aboutStudentDesc:'Learning web development and building real-world projects to sharpen my skills.',
+          aboutDeveloper:'Developer',
+          aboutDeveloperDesc:'Aspiring web developer focused on HTML, CSS, JavaScript, and backend technologies.',
+          statYear:'Year Learning', statProjects:'Projects Built', statJourney:'Learning Journey',
+          servicesTitle:'What I Do', srvWebDev:'Web Development',
+          srvWebDevDesc:'Building responsive and modern websites using HTML, CSS, JavaScript, and backend technologies.',
+          srvUIDesign:'UI Design',
+          srvUIDesignDesc:'Designing clean, user-friendly interfaces with focus on experience and visual appeal.',
+          srvResponsive:'Responsive Sites',
+          srvResponsiveDesc:'Creating mobile-first websites that look great on any device, from phones to desktops.',
+          projectsTitle:'Projects', skillsTitle:'Skills', journeyTitle:'My Journey',
+          testimonialsTitle:'Kind Words',
+          achievementsTitle:'Achievements', achProjects:'Built 2+ Projects',
+          achFullstack:'Learning Full-Stack', achResponsive:'Responsive Design',
+          achLearner:'Continuous Learner',
+          contactTitle:'Contact', contactHeading:"Let's Connect!",
+          contactSub:'Have a question or just want to say hi?',
+          contactFormTitle:'Send a Message',
+          contactNamePlaceholder:'Your name', contactEmailPlaceholder:'Your email',
+          contactMsgPlaceholder:'Your message', contactSendBtn:'Send',
+          contactEmail:'Email Me',
+          settingsTitle:'Settings', settingsTheme:'Theme', settingsPhoto:'Profile Photo',
+          settingsName:'Display Name', settingsTagline:'Tagline',
+          settingsTaglinePlaceholder:'Web Developer & Programmer', settingsBio:'Bio',
+          settingsBioPlaceholder:'Short bio', settingsEmail:'Email',
+          settingsSaveBtn:'Save', settingsPassword:'Settings Password',
+          settingsPasswordPlaceholder:'Leave blank to remove password',
+          settingsExport:'Export', settingsImport:'Import',
+          footerText:'Built with passion by Jonard \u00a9 2026',
+          chatHeader:'Portfolio Assistant', chatPlaceholder:'Ask me anything...',
+          pwdTitle:'Settings Locked', pwdSub:'Enter password to access settings',
+          pwdPlaceholder:'Enter password', pwdCancel:'Cancel', pwdUnlock:'Unlock',
+          pwdError:'Wrong password'
+        },
+        tl: {
+          navAbout:'Tungkol Sakin', navServices:'Serbisyo', navProjects:'Proyekto', navSkills:'Kasanayan',
+          navJourney:'Paglalakbay', navTestimonials:'Testimonyo', navContact:'Kontak',
+          heroViewProjects:'Tingnan Proyekto', heroContact:'Kontakin Ako', heroResume:'Resume',
+          aboutTitle:'Tungkol Sakin', aboutStudent:'Estudyante',
+          aboutStudentDesc:'Nag-aaral ng web development at gumagawa ng totoong proyekto para mahasa ang kakayahan.',
+          aboutDeveloper:'Developer',
+          aboutDeveloperDesc:'Nagsusumikap na web developer na nakatuon sa HTML, CSS, JavaScript, at backend technologies.',
+          statYear:'Taon ng Pag-aaral', statProjects:'Proyektong Nagawa', statJourney:'Paglalakbay sa Pag-aaral',
+          servicesTitle:'Aking Serbisyo', srvWebDev:'Web Development',
+          srvWebDevDesc:'Pagbuo ng responsive at modernong website gamit ang HTML, CSS, JavaScript, at backend technologies.',
+          srvUIDesign:'UI Design',
+          srvUIDesignDesc:'Pagdidisenyo ng malinis at user-friendly na interface na may pokus sa karanasan at visual appeal.',
+          srvResponsive:'Responsive Sites',
+          srvResponsiveDesc:'Paglikha ng mobile-first website na maganda sa kahit anong device, mula phone hanggang desktop.',
+          projectsTitle:'Proyekto', skillsTitle:'Kasanayan', journeyTitle:'Aking Paglalakbay',
+          testimonialsTitle:'Magagandang Salita',
+          achievementsTitle:'Mga Nakamit', achProjects:'2+ Proyektong Nagawa',
+          achFullstack:'Nag-aaral ng Full-Stack', achResponsive:'Responsive Design',
+          achLearner:'Patuloy na Nag-aaral',
+          contactTitle:'Kontak', contactHeading:'Mag-Usap Tayo!',
+          contactSub:'May tanong o gusto lang bumati?',
+          contactFormTitle:'Magpadala ng Mensahe',
+          contactNamePlaceholder:'Iyong pangalan', contactEmailPlaceholder:'Iyong email',
+          contactMsgPlaceholder:'Iyong mensahe', contactSendBtn:'Ipadala',
+          contactEmail:'I-email Ako',
+          settingsTitle:'Settings', settingsTheme:'Tema', settingsPhoto:'Larawan',
+          settingsName:'Pangalan', settingsTagline:'Tagline',
+          settingsTaglinePlaceholder:'Web Developer at Programmer', settingsBio:'Bio',
+          settingsBioPlaceholder:'Maikling bio', settingsEmail:'Email',
+          settingsSaveBtn:'I-save', settingsPassword:'Password ng Settings',
+          settingsPasswordPlaceholder:'Iwanang blangko para tanggalin ang password',
+          settingsExport:'I-export', settingsImport:'I-import',
+          footerText:'Ginawa nang may pagmamahal ni Jonard \u00a9 2026',
+          chatHeader:'Portfolio Assistant', chatPlaceholder:'Magtanong kahit ano...',
+          pwdTitle:'Naka-lock ang Settings', pwdSub:'Ilagay ang password para ma-access ang settings',
+          pwdPlaceholder:'Ilagay ang password', pwdCancel:'Kanselahin', pwdUnlock:'Buksan',
+          pwdError:'Maling password'
+        }
+      };
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (t[lang] && t[lang][key]) el.textContent = t[lang][key];
+        else if (t.en && t.en[key]) el.textContent = t.en[key];
+      });
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        if (t[lang] && t[lang][key]) el.placeholder = t[lang][key];
+        else if (t.en && t.en[key]) el.placeholder = t.en[key];
+      });
+      document.getElementById('langBtn').textContent = lang === 'tl' ? 'TL' : 'EN';
+    }
+    applyLang();
+  </script>
+</body>
+</html>
